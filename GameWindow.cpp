@@ -8,7 +8,7 @@ const int G_X = 32;
 const int G_Y = 60;
 
 int stage_num = 0; // test cases
-int main()
+int window()
 {
   WINDOW *gameWin;
   WINDOW *scoreWin;
