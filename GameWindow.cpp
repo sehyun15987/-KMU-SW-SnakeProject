@@ -31,10 +31,10 @@ int main()
 
   wrefresh(gameWin);
   //mvwprintw(gameWin,1,1,"%d",map[stage_num][0][0]);
-  for(int i = 0; i<G_X;i++){
-    for(int j = 0;j<G_Y;j++){
-      if(map[stage_num][i][j]=='2') mvwprintw(gameWin,i,j,"%s","#");
-      else if(map[stage_num][i][j]=='1') mvwprintw(gameWin,i,j,"%s","*");
+  for(int i = 0; i<32;i++){
+    for(int j = 0;j<32;j++){
+      if(map[stage_num][i][j]==2) mvwprintw(gameWin,i,j,"%s","#");
+      else if(map[stage_num][i][j]==1) mvwprintw(gameWin,i,j,"%s","*");
 
     }
   }
