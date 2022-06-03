@@ -32,7 +32,7 @@ Snake::Snake(pair<int,int> pos) {
 
 void Snake::updateSnake() {
   lastPos = bodies.back();
-  for(int i = 1; i < (int)(bodies.size()); i++) {
+  for(int i = (int)(bodies.size()) - 1; i > 0; i--) {
     bodies[i] = bodies[i - 1];
   }
   bodies[0] = make_pair(x, y);
@@ -72,13 +72,13 @@ vector<pair<int,int> > Snake::getBodies() {
 
 bool Snake::decreaseBody() {
   len -= 1;
-  bodies.pop_back();
+  this->bodies.pop_back();
   if(len < 3) return false;
   return true;
 }
 
 void Snake::growBody() {
-  bodies.push_back(lastPos);
+  this->bodies.push_back(this->lastPos);
   len += 1;
 }
 

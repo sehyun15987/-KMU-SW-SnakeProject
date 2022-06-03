@@ -1,7 +1,6 @@
 #include <iostream>
 #include <unistd.h>
 #include <ncurses.h>
-#include <ctime>
 #include <clocale>
 #include "Snake.h"
 #include "MapManager.h"
@@ -71,9 +70,19 @@ int main() {
     MapManager MapMan(StageCnt);
     Snake snake(MapMan.getInitPos());
     isGameOver = false;
+    MapMan.groPoisGateSet();
     int **CurMap = MapMan.getMap();
-
-    while(!isGameOver) {
+  
+    int turn = 1;
+    while(!isGameOver && turn++) {
+      
+      if(turn > 50) {
+        MapMan.groPoisGateReset();
+        MapMan.groPoisGateSet();
+        CurMap = MapMan.getMap();
+        turn = 1;
+      }
+      
       int nextDir = -1;
       
       long int refTime = clock(); //프로그램이 시작한 시점부터 현재까지 경과한 시간
@@ -116,15 +125,25 @@ int main() {
 
       if(isGameOver) break; // 반대방향 입력이 들어온거므로 반복문 종료.
 
-      snake.updateSnake(); // 스네이크 이동.
       
-
-      int headPos = CurMap[snake.getX()][snake.getY()];
       //머리 위치의 맵 상태
+      snake.updateSnake();
+      int &headPos = CurMap[snake.getX()][snake.getY()];
       if(headPos == 1 || headPos == 2) { //벽이면 게임오버
         isGameOver = true;
+        break;
+      } else if(headPos == 3) {
+        snake.growBody();
+        headPos = 0;
+      } else if (headPos == 4) {
+        if(!snake.decreaseBody()) {
+          isGameOver = true;
+          break;
+        }
+        headPos = 0;
       }
       
+
       vector<pair<int,int> > bodies = snake.getBodies();
       for(int i = 0; i < bodies.size(); i++) { 
         if(bodies[i].first == snake.getX() && bodies[i].second == snake.getY()) {
@@ -135,15 +154,33 @@ int main() {
       }
 
       for (int i = 1; i < 31; i++)
-        for (int j = 1; j < 31; j++)
+        for (int j = 1; j < 31; j++) {
           mvwprintw(gameWin, i, j, " "); // 게임화면 초기화
+          if(CurMap[i][j] == 3) { //grow 아이템
+            mvwprintw(gameWin, i, j, "G");
+          } else if(CurMap[i][j] == 4) { // poison 아이템
+            mvwprintw(gameWin, i, j, "P");
+          }
+        }
+          
+
+      
 
       mvwprintw(gameWin, snake.getX(), snake.getY(), "@"); //머리출력
+      mvwprintw(gameWin, 1, 12, "Head = %d, %d",snake.getX(), snake.getY());
       for (int i = 0; i < bodies.size(); i++)
       {
         const pair<int,int> &p = bodies[i];
         mvwprintw(gameWin, p.first, p.second, "O"); //몸통 출력
+        mvwprintw(gameWin, 2+i, 10, "Body:%d = %d, %d",i + 1, p.first, p.second);
       }
+
+    
+
+      
+      // else if(headPos == 5) {
+        
+      // }
 
       //이쪽에서 게이트와 아이템을 설정
       //한 10~20턴정도마다 초기화되면서 만들어지면
@@ -154,7 +191,7 @@ int main() {
       //다른 위치에 다시 만듦
       
       wrefresh(gameWin);
-      
+
     }
   }
   return 0;
