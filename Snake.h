@@ -43,7 +43,7 @@ public:
 
     bool decreaseBody(); //몸통길이 감소, 3보다 작아지면 false를 리턴하고 게임오버
     void growBody(); //몸통길이 증가
-    
+
     bool conflictCheck();
 };
 #endif

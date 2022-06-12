@@ -21,13 +21,18 @@ private:
     int growY[2];
     int poisX[2];
     int poisY[2];
-    int gat1X, gat2X, gat1Y, gat2Y;
+    
 
 public:
+    int gateX[2];
+    int gateY[2];
     MapManager(int StageCnt);
+    // ~MapManager();
     int **getMap() {return CurMap;}
     pair<int,int> getInitPos() {return initPos;}
-    void groPoisGateReset();
-    void groPoisGateSet();
+    void groPoisReset();
+    void groPoisSet();
+    void gateSet();
+    void gateReset();
 };
 #endif

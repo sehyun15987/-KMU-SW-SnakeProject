@@ -6,6 +6,15 @@
 #include "MapManager.h"
 using namespace std;
 
+
+bool inGate(Snake& snake, int **CurMap) {
+  if(CurMap[snake.getX()][snake.getY()] == 5) return true;
+  vector<pair<int, int> > bodies = snake.getBodies();
+  for(pair<int, int> &p : bodies) {
+    if(CurMap[p.first][p.second] == 5) return true;
+  }
+  return false;
+}
 /********************************************************/
 // kbhit()함수 일단 복붙해서 가져옴.
 bool kbhit()
@@ -70,15 +79,19 @@ int main() {
     MapManager MapMan(StageCnt);
     Snake snake(MapMan.getInitPos());
     isGameOver = false;
-    MapMan.groPoisGateSet();
+    MapMan.groPoisSet();
+    MapMan.gateSet();
     int **CurMap = MapMan.getMap();
-  
     int turn = 1;
     while(!isGameOver && turn++) {
       
       if(turn > 50) {
-        MapMan.groPoisGateReset();
-        MapMan.groPoisGateSet();
+        MapMan.groPoisReset();
+        MapMan.groPoisSet();
+        if(!inGate(snake,CurMap)) {
+          MapMan.gateReset();
+          MapMan.gateSet();
+        }
         CurMap = MapMan.getMap();
         turn = 1;
       }
@@ -141,18 +154,23 @@ int main() {
           break;
         }
         headPos = 0;
+      } else if(headPos == 5) {
+        
       }
       
 
       vector<pair<int,int> > bodies = snake.getBodies();
       for(int i = 0; i < bodies.size(); i++) { 
-        if(bodies[i].first == snake.getX() && bodies[i].second == snake.getY()) {
-          //몸통과 머리가 만나면 게임오버
+        const int &Bx = bodies[i].first;
+        const int &By = bodies[i].second;
+        if(Bx == snake.getX() && By == snake.getY()) { //몸통과 머리가 만나면 게임오버
           isGameOver = true;
           break;
         }
       }
 
+
+      wborder(gameWin,'+','+','+','+','#','#','#','#');
       for (int i = 1; i < 31; i++)
         for (int j = 1; j < 31; j++) {
           mvwprintw(gameWin, i, j, " "); // 게임화면 초기화
@@ -162,6 +180,9 @@ int main() {
             mvwprintw(gameWin, i, j, "P");
           }
         }
+      for(int i = 0; i < 2; i++) {
+        mvwprintw(gameWin, MapMan.gateX[i], MapMan.gateY[i], "W"); // gate,warp
+      }
           
 
       
