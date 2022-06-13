@@ -117,7 +117,7 @@ MapManager::MapManager(int StageCnt) : StageCnt(StageCnt) {
         }
     }
     switch (StageCnt) {
-    case 1:
+    case 0:
         initPos = make_pair(16, 16);
         break;
     default:
