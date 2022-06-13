@@ -11,6 +11,8 @@ using namespace std;
 // 3 == grow
 // 4 == poison
 // 5 == gate
+// Map 크기 32 * 32
+
 
 class MapManager {
 private:

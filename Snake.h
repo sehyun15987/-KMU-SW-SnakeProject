@@ -2,6 +2,7 @@
 #define __SNAKE_H__
 #include <vector>
 #include <utility>
+#include "MapManager.h"
 using namespace std;
 
 
@@ -43,6 +44,8 @@ public:
 
     bool decreaseBody(); //몸통길이 감소, 3보다 작아지면 false를 리턴하고 게임오버
     void growBody(); //몸통길이 증가
+
+    void inGate(MapManager *MapMan);
 
     bool conflictCheck();
 };

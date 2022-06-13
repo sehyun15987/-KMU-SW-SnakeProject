@@ -3,9 +3,7 @@
 #include <ncurses.h>
 #include <clocale>
 #include "Snake.h"
-#include "MapManager.h"
 using namespace std;
-
 
 bool inGate(Snake& snake, int **CurMap) {
   if(CurMap[snake.getX()][snake.getY()] == 5) return true;
@@ -52,24 +50,31 @@ int main() {
   init_pair(1,COLOR_WHITE,COLOR_BLACK);
   WINDOW *gameWin;
   WINDOW *scoreWin;
-  
+  WINDOW *missionWin;
 
   //game
   gameWin = newwin(32,32,1,2);
   wbkgd(gameWin, COLOR_PAIR(1));
   wattron(gameWin, COLOR_PAIR(1));
   wborder(gameWin,'+','+','+','+','#','#','#','#');
-  
   wrefresh(gameWin);
   
 
   //score
-  scoreWin = newwin(10,30,1,63);
+  scoreWin = newwin(14,30,1,63);
   wbkgd(scoreWin, COLOR_PAIR(1));
   wattron(scoreWin, COLOR_PAIR(1));
   wborder(scoreWin, '|', '|', '-', '-', '#', '#', '#', '#');
-  mvwprintw(scoreWin, 1, 10, "SCORE BOARD");
+  mvwprintw(scoreWin, 1, 9, "SCORE BOARD");
   wrefresh(scoreWin);
+
+  //mission
+  missionWin = newwin(17,30,16,63);
+  wbkgd(missionWin, COLOR_PAIR(1));
+  wattron(missionWin, COLOR_PAIR(1));
+  wborder(missionWin, '|', '|', '-', '-', '#', '#', '#', '#');
+  mvwprintw(missionWin, 1, 8, "MISSION BOARD");
+  wrefresh(missionWin);
 
 
 
@@ -78,11 +83,11 @@ int main() {
   while(StageCnt < 3 && !isGameOver) {
     MapManager MapMan(StageCnt);
     Snake snake(MapMan.getInitPos());
-    isGameOver = false;
     MapMan.groPoisSet();
     MapMan.gateSet();
     int **CurMap = MapMan.getMap();
     int turn = 1;
+    bool missionFlag[4] = {false, };
     while(!isGameOver && turn++) {
       
       if(turn > 50) {
@@ -107,16 +112,16 @@ int main() {
           int ch = getch(); //키 입력 받기
           switch (ch) {
           case KEY_RIGHT:
-            nextDir = 0;
+            nextDir = 3;
             break;
           case KEY_LEFT:
             nextDir = 1;
             break;
           case KEY_DOWN:
-            nextDir = 2;
+            nextDir = 0;
             break;
           case KEY_UP:
-            nextDir = 3;
+            nextDir = 2;
             break;
           default:
             break;
@@ -155,7 +160,7 @@ int main() {
         }
         headPos = 0;
       } else if(headPos == 5) {
-        
+        snake.inGate(&MapMan);
       }
       
 
@@ -188,31 +193,36 @@ int main() {
       
 
       mvwprintw(gameWin, snake.getX(), snake.getY(), "@"); //머리출력
-      mvwprintw(gameWin, 1, 12, "Head = %d, %d",snake.getX(), snake.getY());
       for (int i = 0; i < bodies.size(); i++)
       {
         const pair<int,int> &p = bodies[i];
         mvwprintw(gameWin, p.first, p.second, "O"); //몸통 출력
-        mvwprintw(gameWin, 2+i, 10, "Body:%d = %d, %d",i + 1, p.first, p.second);
       }
-
-    
-
-      
-      // else if(headPos == 5) {
-        
-      // }
-
-      //이쪽에서 게이트와 아이템을 설정
-      //한 10~20턴정도마다 초기화되면서 만들어지면
-      //MapManager 에 curmap에서 아이템 게이트만듦
-
-      //아이템, 게이트 위치를 따로 MapManager안에 저장해놓고
-      //다른 숫자로 바꿨다가 없앨때는 저장해놓은 위치들을 원래대로 돌리고
-      //다른 위치에 다시 만듦
-      
       wrefresh(gameWin);
 
+      mvwprintw(scoreWin, 3, 9, "Size : %d / (15)", bodies.size() + 1);
+      mvwprintw(scoreWin, 5, 9, "Grow : %d", snake.getGrowCnt());
+      mvwprintw(scoreWin, 7, 9, "Pois : %d", snake.getPoisCnt());
+      mvwprintw(scoreWin, 9, 9, "Gate : %d", snake.getGateCnt());
+      wrefresh(scoreWin);
+
+      if(bodies.size() + 1 >= 2) missionFlag[0] = true; // 미션 목표 수치
+      if(snake.getGrowCnt() >= 2) missionFlag[1] = true;
+      if(snake.getPoisCnt() >= 2) missionFlag[2] = true;
+      if(snake.getGateCnt() >= 2) missionFlag[3] = true;
+      mvwprintw(missionWin, 4, 9, "Size : 5 (%c)", missionFlag[0] ? 'V' : ' ');
+      mvwprintw(missionWin, 7, 9, "Grow : 6 (%c)", missionFlag[1] ? 'V' : ' ');
+      mvwprintw(missionWin, 10, 9, "Pois : 4 (%c)", missionFlag[2] ? 'V' : ' ');
+      mvwprintw(missionWin, 13, 9, "Gate : 2 (%c)", missionFlag[3] ? 'V' : ' ');
+      wrefresh(missionWin);
+      int cnt = 0;
+      for(int i = 0; i < 4; i++) {
+        cnt += missionFlag[i];
+      }
+      if(cnt == 4) {
+        StageCnt += 1;
+        break;
+      }
     }
   }
   return 0;
