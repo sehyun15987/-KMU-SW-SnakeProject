@@ -106,8 +106,8 @@ void Snake::inGate(MapManager *MapMan) {
   } else {
     int nd[4] = {dir, (dir + 1) % 4, (dir - 1) % 4, (dir + 2) % 4};
     for(int i = 0; i < 4; i++) {
-      int nx = x + dx[i];
-      int ny = y + dy[i];
+      int nx = x + dx[nd[i]];
+      int ny = y + dy[nd[i]];
       if(nx < 0 || nx >= 32 || ny < 0 || ny >= 32) continue;
       if(CurMap[nx][ny] == 0) {
         dir = nd[i];

@@ -180,6 +180,6 @@ void MapManager::gateSet() {
 }
 void MapManager::gateReset() {
     for(int i = 0; i < 2; i++) {
-        CurMap[gateX[i]][gateY[i]] = 0;
+        CurMap[gateX[i]][gateY[i]] = 1;
     }
 }
