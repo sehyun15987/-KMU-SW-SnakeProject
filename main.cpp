@@ -179,7 +179,9 @@ int main() {
       for (int i = 1; i < 31; i++)
         for (int j = 1; j < 31; j++) {
           mvwprintw(gameWin, i, j, " "); // 게임화면 초기화
-          if(CurMap[i][j] == 3) { //grow 아이템
+          if(CurMap[i][j] == 1 || CurMap[i][j] == 2) {
+            mvwprintw(gameWin, i, j, "+");
+          } else if(CurMap[i][j] == 3) { //grow 아이템
             mvwprintw(gameWin, i, j, "G");
           } else if(CurMap[i][j] == 4) { // poison 아이템
             mvwprintw(gameWin, i, j, "P");
