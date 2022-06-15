@@ -117,49 +117,46 @@ MapManager::MapManager(int StageCnt) : StageCnt(StageCnt) {
         }
     }
     switch (StageCnt) {
-    case 0:
-        initPos = make_pair(16, 16);
-        break;
-    default:
-        initPos = make_pair(22, 16);
+        case 0:
+            initPos = make_pair(16, 16);
+            break;
+        default:
+            initPos = make_pair(25, 16);
     }
-
 }
 
 void MapManager::groPoisReset() {
-    for(int i = 0; i < 2; i++) {
-        CurMap[poisX[i]][poisY[i]] = 0;
-        CurMap[growX[i]][growY[i]] = 0;
-    }
+    for(int i = 0; i < 2; i++) CurMap[growX[i]][growY[i]] = 0;
+    CurMap[poisX][poisY] = 0;
 }
 
-void MapManager::groPoisSet() {
+void MapManager::groPoisSet(int x, int y) {
     srand(time(NULL));
     for(int i = 0; i < 2; i++) {
         bool flag = false;
         while(!flag) {
             int tmp = rand() % (32 * 32);
-            if(CurMap[tmp / 32][tmp % 32] == 0) {
-                growX[i] = tmp / 32;
-                growY[i] = tmp % 32;
+            growX[i] = tmp / 32;
+            growY[i] = tmp % 32;
+            if(CurMap[growX[i]][growY[i]] == 0) {
                 flag = true;
             }
         }
         CurMap[growX[i]][growY[i]] = 3;
     }
 
-    for(int i = 0; i < 2; i++) {
-        bool flag = false;
-        while(!flag) {
-            int tmp = rand() % (32 * 32);
-            if(CurMap[tmp / 32][tmp % 32] == 0) {
-                poisX[i] = tmp / 32;
-                poisY[i] = tmp % 32;
-                flag = true;
-            }
+    bool flag = false;
+    while(!flag) {
+        int tmp = rand() % (32 * 32);
+        poisX = tmp / 32;
+        poisY = tmp % 32;
+        int dist = abs(poisX - x) + abs(poisY - y);
+        if(CurMap[poisX][poisY] == 0 && dist >= 4) {
+            flag = true;
         }
-        CurMap[poisX[i]][poisY[i]] = 4;
     }
+    CurMap[poisX][poisY] = 4;
+    
 }
 
 void MapManager::gateSet() {

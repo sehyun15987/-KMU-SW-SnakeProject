@@ -3,6 +3,7 @@
 #include <utility>
 #include <ctime>
 #include <cstdlib>
+#include <vector>
 using namespace std;
 
 // 0 == empty
@@ -21,8 +22,8 @@ private:
     int StageCnt;
     int growX[2];
     int growY[2];
-    int poisX[2];
-    int poisY[2];
+    int poisX;
+    int poisY;
     
 
 public:
@@ -33,8 +34,12 @@ public:
     int **getMap() {return CurMap;}
     pair<int,int> getInitPos() {return initPos;}
     void groPoisReset();
-    void groPoisSet();
+    void groPoisSet(int x, int y);
     void gateSet();
     void gateReset();
+    vector<pair<int,int>> getGateXY() {
+        vector<pair<int,int>> tmp = {make_pair(gateX[0], gateY[0]), make_pair(gateX[1], gateY[1])};
+        return tmp;
+    }
 };
 #endif

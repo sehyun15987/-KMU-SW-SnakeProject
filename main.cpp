@@ -5,11 +5,15 @@
 #include "Snake.h"
 using namespace std;
 
-bool inGate(Snake& snake, int **CurMap) {
-  if(CurMap[snake.getX()][snake.getY()] == 5) return true;
-  vector<pair<int, int> > bodies = snake.getBodies();
-  for(pair<int, int> &p : bodies) {
-    if(CurMap[p.first][p.second] == 5) return true;
+bool inGate(Snake& snake, vector<pair<int,int>> gateXY) {
+  vector<pair<int,int>> bodies = snake.getBodies();
+  for(int i = 0; i < 2; i++) {
+    int dist = abs(snake.getX() - gateXY[i].first) + abs(snake.getY() - gateXY[i].second);
+    if(dist <= 4) return true;
+    for(pair<int,int> &p : bodies) { 
+      dist = abs(p.first - gateXY[i].first) + abs(p.second - gateXY[i].second);
+      if(dist <= 1) return true;
+    }
   }
   return false;
 }
@@ -81,19 +85,28 @@ int main() {
   int StageCnt = 0;
   bool isGameOver = false;
   while(StageCnt < 3 && !isGameOver) {
+    
+    mvprintw(3,42, "STAGE NUM : #%d",StageCnt + 1);
+    mvprintw(5,38,"PRESS ANY KEY TO START");
+    refresh();
+    getch();
+    mvprintw(3,42, "                     ");
+    mvprintw(5,38, "                        ");
+    refresh();
+
     MapManager MapMan(StageCnt);
     Snake snake(MapMan.getInitPos());
-    MapMan.groPoisSet();
+    MapMan.groPoisSet(snake.getX(), snake.getY());
     MapMan.gateSet();
     int **CurMap = MapMan.getMap();
     int turn = 1;
     bool missionFlag[4] = {false, };
     while(!isGameOver && turn++) {
-      
-      if(turn > 50) {
+    
+      if(turn > 85) {
         MapMan.groPoisReset();
-        MapMan.groPoisSet();
-        if(!inGate(snake,CurMap)) {
+        MapMan.groPoisSet(snake.getX(),snake.getY());
+        if(!inGate(snake,MapMan.getGateXY())) {
           MapMan.gateReset();
           MapMan.gateSet();
         }
@@ -208,13 +221,13 @@ int main() {
       mvwprintw(scoreWin, 9, 9, "Gate : %d", snake.getGateCnt());
       wrefresh(scoreWin);
 
-      if(bodies.size() + 1 >= 2) missionFlag[0] = true; // 미션 목표 수치
-      if(snake.getGrowCnt() >= 2) missionFlag[1] = true;
-      if(snake.getPoisCnt() >= 2) missionFlag[2] = true;
+      if(bodies.size() + 1 >= 6) missionFlag[0] = true; // 미션 목표 수치
+      if(snake.getGrowCnt() >= 6) missionFlag[1] = true;
+      if(snake.getPoisCnt() >= 3) missionFlag[2] = true;
       if(snake.getGateCnt() >= 2) missionFlag[3] = true;
-      mvwprintw(missionWin, 4, 9, "Size : 5 (%c)", missionFlag[0] ? 'V' : ' ');
+      mvwprintw(missionWin, 4, 9, "Size : 6 (%c)", missionFlag[0] ? 'V' : ' ');
       mvwprintw(missionWin, 7, 9, "Grow : 6 (%c)", missionFlag[1] ? 'V' : ' ');
-      mvwprintw(missionWin, 10, 9, "Pois : 4 (%c)", missionFlag[2] ? 'V' : ' ');
+      mvwprintw(missionWin, 10, 9, "Pois : 3 (%c)", missionFlag[2] ? 'V' : ' ');
       mvwprintw(missionWin, 13, 9, "Gate : 2 (%c)", missionFlag[3] ? 'V' : ' ');
       wrefresh(missionWin);
       int cnt = 0;
